@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 	"strconv"
@@ -39,12 +40,19 @@ func pathID(r *http.Request, name string) (int64, bool) {
 }
 
 func (h *Handler) SearchMovies(w http.ResponseWriter, r *http.Request) {
-	items, err := h.Store.SearchMovies(r.Context(), r.URL.Query().Get("q"))
+	items, err := h.Store.SearchMovies(
+		r.Context(),
+		r.URL.Query().Get("q"),
+		0,
+	)
 	if err != nil {
 		internal(w, err)
 		return
 	}
-	writeJSON(w, http.StatusOK, map[string]any{"items": items})
+
+	writeJSON(w, http.StatusOK, map[string]any{
+		"items": items,
+	})
 }
 
 func (h *Handler) ListReviews(w http.ResponseWriter, r *http.Request) {
@@ -59,4 +67,24 @@ func (h *Handler) ListReviews(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"items": items})
+}
+
+func (h *Handler) GetMovie(w http.ResponseWriter, r *http.Request) {
+	id, ok := pathID(r, "id")
+	if !ok {
+		writeError(w, http.StatusBadRequest, "BAD_ID", "เลขหนังต้องเป็นตัวเลข")
+		return
+	}
+
+	movie, err := h.Store.GetMovie(r.Context(), id)
+	if errors.Is(err, store.ErrNotFound) {
+		writeError(w, http.StatusNotFound, "MOVIE_NOT_FOUND", "ไม่พบหนังเรื่องนี้")
+		return
+	}
+	if err != nil {
+		internal(w, err)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, movie)
 }
