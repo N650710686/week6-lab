@@ -1,44 +1,38 @@
-import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 
-const linkClass = ({ isActive }) =>
-  'text-sm transition ' + (isActive ? 'font-medium text-emerald-600' : 'text-slate-500 hover:text-emerald-600');
-
 function Navbar() {
-  const { isLoggedIn, member, logout } = useAuth();   // Navbar รู้สถานะ login ได้โดยไม่ต้องรับ props จากใคร
-  const navigate = useNavigate();
+  const { isLoggedIn, isAdmin, member, logout } = useAuth();
 
-  function handleLogout() {
-    logout();
-    navigate('/');
-  }
+  const linkClass = ({ isActive }) =>
+    'text-sm font-medium transition ' + (isActive ? 'text-emerald-600' : 'text-slate-600 hover:text-slate-900');
 
   return (
     <header className="border-b border-emerald-100 bg-white">
-      <nav className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-4 md:px-6">
-        <Link to="/" className="text-lg font-semibold tracking-tight text-emerald-600">
-          🎬 MovieHub
+      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 md:px-6">
+        <Link to="/" className="text-lg font-bold text-emerald-600">
+          MovieHub
         </Link>
-        <div className="flex items-center gap-5">
-          <NavLink to="/" end className={linkClass}>หน้าแรก</NavLink>
-          <NavLink to="/movies" className={linkClass}>หนัง</NavLink>
+        <nav className="flex items-center gap-4">
+          <NavLink to="/" className={linkClass}>หน้าแรก</NavLink>
+          <NavLink to="/movies" className={linkClass}>หนังทั้งหมด</NavLink>
           {isLoggedIn && <NavLink to="/me/wishlist" className={linkClass}>อยากดู</NavLink>}
-          <NavLink to="/lab" className={linkClass}>API Lab</NavLink>
           <NavLink to="/about" className={linkClass}>เกี่ยวกับ</NavLink>
-        </div>
-        <div className="ml-auto flex items-center gap-3 text-sm">
+          {isAdmin && <NavLink to="/admin" className={linkClass}>หลังบ้าน</NavLink>}
           {isLoggedIn ? (
-            <>
-              <span className="text-slate-600">สวัสดี {member?.displayName}</span>
-              <button onClick={handleLogout} className="text-slate-500 hover:text-emerald-600">ออกจากระบบ</button>
-            </>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-slate-500">{member?.displayName}</span>
+              <button onClick={logout} className="rounded-lg border border-slate-200 px-3 py-1 text-xs text-slate-600 hover:bg-slate-50">
+                ออกจากระบบ
+              </button>
+            </div>
           ) : (
-            <Link to="/login" className="rounded-lg border border-emerald-200 bg-white px-3 py-1.5 text-emerald-700 hover:bg-emerald-50">
+            <Link to="/login" className="rounded-lg bg-emerald-500 px-3 py-1 text-xs font-medium text-white hover:bg-emerald-600">
               เข้าสู่ระบบ
             </Link>
           )}
-        </div>
-      </nav>
+        </nav>
+      </div>
     </header>
   );
 }
