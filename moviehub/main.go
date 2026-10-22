@@ -47,6 +47,7 @@ func main() {
 	mux.HandleFunc("GET /api/movies", h.SearchMovies)
 	mux.HandleFunc("GET /api/movies/{id}", h.GetMovie)
 	mux.HandleFunc("GET /api/movies/{id}/reviews", h.ListReviews)
+	mux.HandleFunc("POST /api/movies/{id}/reviews", login(h.AddReview))
 
 	// หลังบ้าน: ทุกเส้นทางใต้ /api/admin ผ่าน admin(...) ไม่มีข้อยกเว้น
 	mux.HandleFunc("GET /api/admin/stats", admin(h.AdminStats))

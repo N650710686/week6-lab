@@ -88,3 +88,16 @@ export function updateMovie(movieId, fields, token) {
 export function deleteMovie(movieId, token) {
   return apiFetch(`/api/admin/movies/${movieId}`, { method: 'DELETE', token }); // 204 ได้ null
 }
+
+export async function getReviews(movieId) {
+  const data = await apiFetch(`/api/movies/${movieId}/reviews`);
+  return data;
+}
+
+export function postReview(movieId, text, token) {
+  return apiFetch(`/api/movies/${movieId}/reviews`, {
+    method: 'POST',
+    body: { text },
+    token,
+  });
+}
