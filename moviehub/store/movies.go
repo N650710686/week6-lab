@@ -25,7 +25,7 @@ func (s *Store) SearchMovies(ctx context.Context, q string, genreID int) ([]Movi
                    CASE WHEN m.poster_path LIKE 'http%' THEN m.poster_path
                         ELSE 'https://image.tmdb.org/t/p/w500' || m.poster_path END,
                    EXTRACT(YEAR FROM m.release_date)::int,
-                   (SELECT g.name FROM movie_genres mg JOIN genres g ON g.id = mg.genre_id WHERE mg.movie_id = m.id AND mg.position = 0),
+                   (SELECT g.name_en FROM movie_genres mg JOIN genres g ON g.id = mg.genre_id WHERE mg.movie_id = m.id AND mg.position = 0),
                    round(m.vote_average, 1)::float8
             FROM movies m
             WHERE 1=1`
@@ -65,7 +65,7 @@ func (s *Store) GetMovie(ctx context.Context, id int64) (Movie, error) {
 				CASE WHEN m.poster_path LIKE 'http%' THEN m.poster_path
 					 ELSE 'https://image.tmdb.org/t/p/w500' || m.poster_path END,
 				EXTRACT(YEAR FROM m.release_date)::int,
-				(SELECT g.name FROM movie_genres mg JOIN genres g ON g.id = mg.genre_id WHERE mg.movie_id = m.id AND mg.position = 0),
+				(SELECT g.name_en FROM movie_genres mg JOIN genres g ON g.id = mg.genre_id WHERE mg.movie_id = m.id AND mg.position = 0),
 				round(m.vote_average, 1)::float8,
 				m.overview, m.overview_th
 		 FROM movies m WHERE m.id = $1`, id).
